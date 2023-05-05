@@ -1,0 +1,173 @@
+CREATE DATABASE Praksa
+
+
+CREATE TABLE Biblioteke (
+  bibliotekaID INT PRIMARY KEY AUTO_INCREMENT,
+  naziv VARCHAR(45) ,
+  ulica VARCHAR(45) ,
+  broj VARCHAR(5) ,
+  mesto VARCHAR(45) ,
+  telefon VARCHAR(45)
+)ENGINE INNODB;
+
+
+CREATE TABLE Clanovi (
+  clanID INT PRIMARY KEY AUTO_INCREMENT,
+  ime VARCHAR(45),
+  prezime VARCHAR(45),
+  datunRodj DATE ,
+  telefon VARCHAR(45),
+  clanskaKartaBr INT,
+  Ulica VARCHAR(45),
+  broj VARCHAR(5),
+  Mesto VARCHAR(45),
+)ENGINE INNODB;
+
+
+CREATE TABLE bibliotekeClanovi (
+  bibliotekeClanoviId int PRIMARY KEY AUTO_INCREMENT,	
+  bibliotekaID INT,
+  clanID INT,
+  FOREIGN KEY(bibliotekaID) REFERENCES Biblioteke(bibliotekaID)
+  ON UPDATE CASCADE
+  ON DELETE NO ACTION,
+  FOREIGN KEY(clanID) REFERENCES Clanovi(clanID)
+  ON UPDATE CASCADE
+  ON DELETE NO ACTION    
+)ENGINE INNODB;
+
+
+CREATE TABLE Bibliotekari(
+  bibliotekarId INT PRIMARY KEY AUTO_INCREMENT,
+  ime VARCHAR(45),
+  prezime VARCHAR(45),
+  sifra VARCHAR(45),
+  ulica VARCHAR(45),
+  broj VARCHAR(5),
+  mesto VARCHAR(45),
+  jmbg VARCHAR(45),
+  telefon VARCHAR(45),
+  bibliotekaID INT,
+  FOREIGN KEY (bibliotekaID) REFERENCES Biblioteke(bibliotekaID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+)ENGINE INNODB;
+
+
+CREATE TABLE Odeljenja(
+    odeljenjeID int PRIMARY KEY AUTO_INCREMENT,
+    bibliotekaID int,
+    FOREIGN KEY(bibliotekaID) REFERENCES biblioteke(bibliotekaID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+)ENGINE INNODB;
+
+
+CREATE TABLE Decije(
+  decijeId INT PRIMARY KEY AUTO_INCREMENT,
+  uzrast VARCHAR(20) NULL,
+  FOREIGN KEY (decijeId) REFERENCES Odeljenja(odeljenjeID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+)ENGINE INNODB;
+
+
+CREATE TABLE Naucno(
+	naucnoId int PRIMARY KEY AUTO_INCREMENT,
+    oblast varchar(45),
+    FOREIGN KEY(naucnoID) REFERENCES odeljenja(odeljenjeID)
+	ON UPDATE CASCADE
+    ON DELETE NO ACTION
+)ENGINE INNODB;
+
+
+CREATE TABLE Zanrovi(
+	zanrID int PRIMARY KEY AUTO_INCREMENT,
+	naziv varchar(45),
+	opis varchar(100)
+)ENGINE INNODB;
+
+
+CREATE TABLE Knjige(
+  knjigaID INT PRIMARY KEY AUTO_INCREMENT,
+  ISBN varchar(45),
+  naziv VARCHAR(45),
+  jezik VARCHAR(45),
+  izdavac VARCHAR(45),
+  zanrID int,
+  odeljenjeID int, 
+  FOREIGN KEY (zanrID) REFERENCES zanrovi(zanrID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+  FOREIGN KEY(odeljenjeID) REFERENCES Odeljenja(odeljenjeID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+)ENGINE INNODB;
+
+
+CREATE TABLE pisci(
+    pisacId int PRIMARY KEY AUTO_INCREMENT,
+    ime varchar(45),
+    prezime varchar(45)
+)ENGINE INNODB;
+
+
+CREATE TABLE pisciKnjige(
+pisacKnigaID int PRIMARY KEY AUTO_INCREMENT,
+    pisacID int,
+    knjigaID int,
+    FOREIGN KEY(pisacID) REFERENCES pisci(pisacID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+    FOREIGN KEY(knjigaID) REFERENCES knjige(knjigaID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+)ENGINE INNODB;
+
+
+CREATE TABLE Iznajmljivanja(
+	iznajmljivanjeID int PRIMARY KEY AUTO_INCREMENT,
+    datumIzdavanja date,
+    datumVracanja date,
+    knjigaID int,
+    clanID int,
+    bibliotekarID int,
+    pozajmnoId int,
+    FOREIGN KEY(knjigaID) REFERENCES knjige(knjigaID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+    FOREIGN KEY(clanID) REFERENCES clanovi(clanID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+    FOREIGN KEY(bibliotekarID) REFERENCES bibliotekari(bibliotekarID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+    FOREIGN KEY(pozajmnoID) REFERENCES pozajmno(pozajmnoID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION 
+)ENGINE INNODB;
+
+
+________________________________________________________________________
+
+Unos podataka:
+
+INSERT INTO `biblioteke`(`naziv`, `ulica`, `broj`, `mesto`, `telefon`) 
+VALUES ('Narodna biblioteka','Skerliceva','1','Beograd','011/2451242'),
+       ('Gradska biblioteka','Kneza Mihajla','56','Beograd','011/2024011')
+
+
+INSERT INTO `bibliotekari`(`ime`, `prezime`, `sifra`, `ulica`, `broj`, `mesto`, `jmbg`, `telefon`, `bibliotekaID`) 
+VALUES ('Marko','Markovic','z897','Hilandarska','22','Beograd','1810985710555','065222444','1'),
+	('Sima','Simic','z471','Makedonska','55','Beograd','2903970710424','063111333','2'),
+        ('Ana','Popovic','z144','Mekenzijeva','72','Beograd','0505975715244','061123456','1')
+
+
+INSERT INTO `clanovi`(`ime`, `prezime`, `datunRodj`, `telefon`, `clanskaKartaBr`, `Ulica`, `broj`, `Mesto`) 
+VALUES ('Darko','Nikolic','1975-05-05','064888999','1234','Vasina','3a','Beograd'),
+	('Sanja','Spasic','1985-08-23','0615789744','1887','Kralja Milana','23','Beograd'),	
+       ('Stasa','Radanovic','1983-10-15','0691754899','2113','Tipografska','30','Beograd'),
+       ('Marija','Nikolovski','1990-12-01','0651534123','1889','Bulevar Oslobodjenja','180','Beograd')
+
+INSERT INTO `bibliotekeclanovi`(`bibliotekaID`, `clanID`)
+VALUES (1,1),(1,2),(2,3),(1,4)
