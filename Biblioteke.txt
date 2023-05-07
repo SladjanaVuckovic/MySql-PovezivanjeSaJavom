@@ -20,7 +20,7 @@ CREATE TABLE Clanovi (
   clanskaKartaBr INT,
   Ulica VARCHAR(45),
   broj VARCHAR(5),
-  Mesto VARCHAR(45),
+  Mesto VARCHAR(45)
 )ENGINE INNODB;
 
 
@@ -53,34 +53,6 @@ CREATE TABLE Bibliotekari(
     ON DELETE NO ACTION
 )ENGINE INNODB;
 
-
-CREATE TABLE Odeljenja(
-    odeljenjeID int PRIMARY KEY AUTO_INCREMENT,
-    bibliotekaID int,
-    FOREIGN KEY(bibliotekaID) REFERENCES biblioteke(bibliotekaID)
-    ON UPDATE CASCADE
-    ON DELETE NO ACTION
-)ENGINE INNODB;
-
-
-CREATE TABLE Decije(
-  decijeId INT PRIMARY KEY AUTO_INCREMENT,
-  uzrast VARCHAR(20) NULL,
-  FOREIGN KEY (decijeId) REFERENCES Odeljenja(odeljenjeID)
-    ON UPDATE CASCADE
-    ON DELETE NO ACTION
-)ENGINE INNODB;
-
-
-CREATE TABLE Naucno(
-	naucnoId int PRIMARY KEY AUTO_INCREMENT,
-    oblast varchar(45),
-    FOREIGN KEY(naucnoID) REFERENCES odeljenja(odeljenjeID)
-	ON UPDATE CASCADE
-    ON DELETE NO ACTION
-)ENGINE INNODB;
-
-
 CREATE TABLE Zanrovi(
 	zanrID int PRIMARY KEY AUTO_INCREMENT,
 	naziv varchar(45),
@@ -95,11 +67,11 @@ CREATE TABLE Knjige(
   jezik VARCHAR(45),
   izdavac VARCHAR(45),
   zanrID int,
-  odeljenjeID int, 
+  bibliotekaID int, 
   FOREIGN KEY (zanrID) REFERENCES zanrovi(zanrID)
     ON UPDATE CASCADE
     ON DELETE NO ACTION,
-  FOREIGN KEY(odeljenjeID) REFERENCES Odeljenja(odeljenjeID)
+  FOREIGN KEY(bibliotekaID) REFERENCES Biblioteke(bibliotekaID)
     ON UPDATE CASCADE
     ON DELETE NO ACTION
 )ENGINE INNODB;
@@ -122,7 +94,40 @@ pisacKnigaID int PRIMARY KEY AUTO_INCREMENT,
     FOREIGN KEY(knjigaID) REFERENCES knjige(knjigaID)
     ON UPDATE CASCADE
     ON DELETE NO ACTION
+   )ENGINE INNODB;
+
+
+CREATE TABLE DecijeOdeljenje(
+  decijeId INT PRIMARY KEY AUTO_INCREMENT,
+  uzrast VARCHAR(20) NULL,
+  knjigaID int,
+  FOREIGN KEY(knjigaID) REFERENCES Knjige(knjigaID)
+  ON UPDATE CASCADE
+  ON DELETE NO ACTION,
+  FOREIGN KEY (decijeId) REFERENCES Biblioteke(bibliotekaID)
 )ENGINE INNODB;
+
+
+CREATE TABLE NaucnoOdeljenje(
+    naucnoId int PRIMARY KEY AUTO_INCREMENT,
+    oblast varchar(45),
+    knjigaId int,
+    FOREIGN KEY(knjigaID) REFERENCES knjige(knjigaID)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+    FOREIGN KEY(naucnoID) REFERENCES biblioteke(bibliotekaID)
+)ENGINE INNODB;
+
+
+CREATE TABLE PozajmnoOdeljenje (
+  pozajmnoID int PRIMARY KEY  AUTO_INCREMENT,
+  aktuelnost VARCHAR(45),
+  knjigaID INT,
+    FOREIGN KEY (knjigaID) REFERENCES Knjige (`knjigaID`)
+    ON UPDATE CASCADE
+    ON DELETE NO ACTION,
+    FOREIGN KEY (pozajmnoID) REFERENCES Biblioteke(`bibliotekaID`)
+)ENGINE = InnoDB;
 
 
 CREATE TABLE Iznajmljivanja(
@@ -142,13 +147,13 @@ CREATE TABLE Iznajmljivanja(
     FOREIGN KEY(bibliotekarID) REFERENCES bibliotekari(bibliotekarID)
     ON UPDATE CASCADE
     ON DELETE NO ACTION,
-    FOREIGN KEY(pozajmnoID) REFERENCES pozajmno(pozajmnoID)
+    FOREIGN KEY(pozajmnoID) REFERENCES pozajmnoodeljenje(pozajmnoID)
     ON UPDATE CASCADE
     ON DELETE NO ACTION 
 )ENGINE INNODB;
 
 
-________________________________________________________________________
+_____________________________________________________
 
 Unos podataka:
 
@@ -171,3 +176,33 @@ VALUES ('Darko','Nikolic','1975-05-05','064888999','1234','Vasina','3a','Beograd
 
 INSERT INTO `bibliotekeclanovi`(`bibliotekaID`, `clanID`)
 VALUES (1,1),(1,2),(2,3),(1,4)
+
+
+INSERT INTO `zanrovi`(`naziv`, `opis`) 
+VALUES ('Poezija','Sve vrste poezije'), 
+('Fantastika','Naucna i epska fantastika'),
+('Klasici','Klasici svetske i domace knjizevnosti'), 
+('Beletristika','Popularna izdanja svetske i domace knjizevnosti')
+
+
+INSERT INTO `knjige`(`ISBN`, `naziv`, `jezik`, `izdavac`, `zanrID`, `bibliotekaID`) 
+VALUES ('9788677028169','Dina','sprski','Čarobna knjiga','2','2'),
+		('9788681464526','Sabrane pesme','sprski','Delfi knjige','1','1'),
+        ('9788610013658','Majstor i Margarita','sprski','Vulkan izdavaštvo','3','1'),
+        (' 9788652147557','Sicilijanac','sprski','Laguna','4','2')
+        
+        
+INSERT INTO `pisci`(`ime`, `prezime`) 
+     VALUES ('Frank','Herbert'),
+    	    ('Edgar','Allan Poe'),
+            ('Mihail','Bulgakov'),
+            ('Mario','Puzo')
+
+
+INSERT INTO `pisciknjige`(`pisacID`, `knjigaID`) 
+	VALUES ('1','1'), ('2','2'),('3','3'),('4','4')
+
+
+  
+        
+        
